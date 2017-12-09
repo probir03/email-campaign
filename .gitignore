@@ -1,0 +1,9 @@
+xenv.py
+env.py
+!migrations/env.py
+*.pyc
+*.swp
+venv/
+static/dist/
+node_modules/
+.vscode/

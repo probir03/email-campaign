@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid" id="app">
+    <div class="card bg-light mb-3">
+        <div class="card-header"><h4><strong>{{ drip.title }}</strong></h4></div>
+        <div class="card-block" style="padding: 10px 20px 10px 20px;background: white;">
+            <p class="card-text">
+                {{ drip.description }}
+            </p>
+        </div>
+    </div>
+    <form action="/drips/{{drip.id}}/emails" method="POST">
+        <div class="form-group">
+            <label for="exampleFormControlInput1">Attach Email</label>
+            <input type="email" class="form-control" name="email" placeholder="email@example.com">
+        </div>
+        <div class="form-group">
+            <button class="btn btn-md btn-success float-right" type="submit">Attach</button>
+        </div>
+        <ul>
+            {% if drip.recipient %}
+                {% for email in drip.recipient.split(',') %}
+                    <li>{{email}}</li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </form>
+</div>
+
+{% endblock %}

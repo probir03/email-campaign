@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<title>Sourceeasy - Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="/static/css/vendor.min.css?v=1">
+		<link rel="stylesheet" href="/static/css/style.min.css?v=1">
+<style>
+
+Select all
+.stylish-panel {
+    padding: 20px 0;
+    text-align: center;
+}
+.containerDiv{
+  padding:15px;
+}
+.containerDiv > div{
+    padding: 10px;
+    position:relative;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    top:0px;
+    transition: 0.2s;
+}
+.containerDiv:hover > div{
+    position:relative;
+    top:-10px;
+    border: 1px solid rgb(200, 200, 200);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 5px 5px 2px;
+    background: rgba(200, 200, 200, 0.1);
+    transition: top 0.5s;
+}
+
+.containerDiv:hover > div > img {
+    border-radius: 50%;
+}
+</style>
+<body>
+
+<div class="container">
+	<div class="page-header">
+		<div class="row">
+			<div class="col-l-6" style="float:left;">
+				<h2>Admin Panel</h2>
+			</div>
+			<div class="col-l-4" style="float:right;  margin-top:15px">
+				<form action="appLogout" method="GET">
+					<button type="submit" class="btn btn-primary">Logout</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row stylish-panel">
+		</div>
+	</div>
+	<div>
+		<span>
+			<h3>Welcome {{ user.displayName }}</h3>
+		</span>
+		<span style="float:right">
+			
+		</span>
+	</div>
+</div>
+<!-- /container -->
+
+<input id="tokVar" type="hidden" value="{{token}}"/>
+<script src="/static/js/vendor.min.js?v=1"></script>
+<script src="/static/js/app.min.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <a href="drip/create">
+                <button class="btn btn-sm btn-success">Create Drip</button>
+            </a>
+        </div>
+    </div>
+    <br>
+    {% if drips %}
+        <div class="card-columns">
+        {% for drip in drips %}
+            <a href="/drips/{{drip.id}}">
+                <div class="card" style="width: 20rem;">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ drip.title }}</h4>
+                        <h5 class="card-subtitle mb-2 text-muted">{{ drip.description }}</h5>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+        </div> 
+    {% endif %}
+</div>
+
+{% endblock %}

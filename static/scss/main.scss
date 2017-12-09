@@ -1,0 +1,116 @@
+.feed-body img {
+	width: 100%;
+}
+
+.loginForm {
+  box-shadow: 0 0 10px 2px #dcdcdc;
+  border: none;
+  border-radius: 2px;
+  padding: 16px 24px;
+}
+.googleLoginBtn {
+  background-color: #fff;
+  line-height: 36px;
+  border-radius: 2px;
+  border: 1px solid #dcdcdc;
+  width: 100%;
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
+  cursor: pointer;
+  transition: 0.4s ease;
+  margin: 14px auto 2px auto;
+}
+.googleLoginBtn:hover {
+  box-shadow: 1px 1px 8px 0px #dcdcdc;
+  border: 1px solid #989898;
+}
+.logo {
+  display: inline;
+  text-indent: -9999px;
+  width: 240px;
+  height: 30px;
+  background: url(/static/img/logo.svg);
+  background-size: 240px 30px;
+}
+.form-control {
+  box-shadow: none;
+  border-radius: 2px;
+}
+label {
+  font-weight: 400;
+}
+.line-through {
+  position: relative;
+  margin: 20px 0;
+  width: 100%;
+  text-align: center;
+}
+.line-through span {
+  padding: 0 10px;
+  position: relative;
+  z-index: 2;
+  background-color: #fff;
+}
+.line-through:before {
+  display: block;
+  width: 100%;
+  height: 1px;
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  background-color: #dcdcdc;
+}
+
+.sideBarItems {
+  padding: 4px 15px;
+  cursor: pointer;
+}
+.sideBarItems:hover {
+  background: #f2f2f2;
+}
+.sidebarSubGroup {
+  padding-left: 0px;
+  display: none;
+}
+.sideBarSubGroupItem {
+  padding: 3px 0px 3px 25px;
+  border-bottom: 1px solid white;
+  cursor: pointer;
+}
+.sideBarAdminHeader {
+  padding: 7px;
+}
+.hrefLink {
+  color: black !important;
+}
+.hrefLink:hover {
+  text-decoration: none;
+}
+.sidebarAdmin {
+  border-top: 1px solid lightgrey;
+}
+
+.true {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border: 1px solid;
+  border-color: #d6e9c6;
+  text-align: center;
+}
+.false {
+  color: #a94442;
+  background-color: #f2dede;
+  border: 1px solid;
+  border-color: #ebccd1;
+  text-align: center;
+}
+.text-align-left {
+  text-align: left;
+  padding-left: 15px !important;
+}
+.milestone-list,
+.milestone-list tr th {
+  text-align: center;
+}

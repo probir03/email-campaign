@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Sourceeasy - Login</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="/static/dist/vendor.css?v=1">
+		<link rel="stylesheet" href="/static/dist/vendor.js?v=1">
+
+	</head>
+<body>
+
+	<div class="container">
+		<nav class="navbar navbar-fixed-top" style="background: #fff;">
+			<div class="container" style="text-align:center;">
+			</div>
+		</nav>
+
+		<div class="content col-md-6 col-md-offset-3" style="padding-top: 8rem;height: 100%;">
+
+
+			<div class="loginForm">
+				<h3 style="font-weight:300; margin: 10px 0 20px 0;">Log in</h3>
+				{% with messages = get_flashed_messages() %}
+				{% if messages %}
+				{% for message in messages %}
+				<div {% if message.tags == 'error' %} class="alert alert-danger"
+						{% elif message.tags == 'success' %} class="alert alert-success"
+						{% endif %}>
+					{{ message.message }}
+				</div>
+				{% endfor %}
+				{% endif %}
+				{% endwith %}
+
+				
+				<a href="/app/signin?provider=google">
+				<div id="googleLogin" data-link="google" class="googleLoginBtn">
+					<span>
+						<img src="data:image/png;base64,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" style="height: 36px; width: 36px; padding: 2px;"/>
+						<span>Log in with Google</span>
+					</span>
+				</div>
+				</a>
+
+				<!-- <div class="line-through">
+					<span style="color: #989898;">Or log in with email</span>
+				</div> -->
+
+				<!-- <div class="auth-content">
+					<form method="post" action="appLogin">
+						<div class="form-group">
+							<label for="email">Email</label> -->
+							<!--<div class="col-sm-10">-->
+								<!-- <input type="email" class="form-control" name="email" autofocus required/> -->
+							<!--</div>-->
+						<!-- </div>
+
+						<div class="form-group">
+							<label for="password">Password</label> -->
+							<!--<div class="col-sm-10">-->
+								<!-- <input type="password" class="form-control" name="password" required/> -->
+							<!--</div>-->
+						<!-- </div>
+
+						<div style="clear: both;">
+							<button type="submit" class="btn btn-primary">Log in</button>
+							<a style="float: right;margin-bottom: 10px;" href="/auth/resetpassword">Forgot password?</a>
+						</div>
+
+						<div class="form-group"> -->
+							<!--<div class="col-sm-offset-2 col-sm-10">-->
+								
+							<!--</div>-->
+					<!-- 	</div>
+					</form>
+				</div> -->
+			</div>
+		</div>
+	</div>
+
+    <!--<div style="margin-top: 15px;">
+        <span>
+          <a href="javascript:void(0);" class="linkDesign">Create Account</a>
+        </span>
+
+        <span flex></span>
+
+        <span>
+            <a href="javascript:void(0);" class="linkDesign">Forgot Password</a>
+        </span>
+    </div>-->
+
+
+<script src="/static/js/vendor.min.js?v=1"></script>
+<script src="/static/js/app.min.js?v=1"></script>
+</body>
+</html>
