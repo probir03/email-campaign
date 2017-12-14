@@ -16,6 +16,7 @@ Create env.py file and add keys
 	GOOGLE_CLIENT_SECRET='secret key'
 
 Run Command
+	
 	```
 	$ pip install -r requirements.txt
 
@@ -33,4 +34,4 @@ set in crontab or use supervisor
 	celery worker -A EmailJob.email_manager.celery
 
 	```
-	
+
