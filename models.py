@@ -57,6 +57,8 @@ class Drip(db.Model):
         
     @property
     def recipient_list(self):
+        if not self.recipient:
+            return []
         return self.recipient.split(', ')
 
     @property

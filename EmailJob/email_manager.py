@@ -10,7 +10,7 @@ celery.conf.update(app.config)
 class DripCampaign():
 
 	def run(self):
-		drips = models.Drip.query.all()
+		drips = models.Drip.query.filter_by(is_enabled=True, is_completed=False).all()
 		print drips
 		i = 1
 		for drip in drips:

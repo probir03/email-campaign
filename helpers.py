@@ -82,8 +82,8 @@ def modify_url(url):
 get respective api server url
 '''
 def get_local_server_url():
-    if app.config['APP_ENV'] == 'production':
-        return "http://139.59.71.222"
+    if app.config['APP_ENV'] == 'local':
+        return "http://0a9ad8ec.ngrok.io"
     return "http://localhost:5000"
 
 '''
