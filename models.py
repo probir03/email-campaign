@@ -21,6 +21,8 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, server_default=func.now())
     updated_at = db.Column(db.DateTime, nullable=False, default=func.now(), onupdate=func.now())
     logo = db.Column(db.Text)
+    credentials = db.Column(db.JSON)
+    message_thread = db.Column(db.JSON)
 
     def transform(self):
         return {
@@ -41,8 +43,33 @@ class Drip(db.Model):
     stage_number = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text, nullable=True)
     recipient = db.Column(db.JSON, nullable=True)
+    is_enabled = db.Column(db.Boolean, default=False)
+    is_completed = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=func.now())
     updated_at = db.Column(db.DateTime, nullable=False, default=func.now(), onupdate=func.now())
+
+    stages = relationship("Stage", backref="drip", order_by="asc(Stage.created_at)")
+    user = relationship("User", backref="drips")
+
+    @property
+    def owner(self):
+        return User.query.filter_by(id=self.user_id).first()
+        
+    @property
+    def recipient_list(self):
+        return self.recipient.split(', ')
+
+    @property
+    def letast_stage(self):
+        return Stage.query.filter(Stage.drip_id==self.id).order_by('created_at').first()
+
+    @property
+    def running_stage(self):
+        return Stage.query.filter(Stage.drip_id==self.id).order_by('created_at').first()
+
+    @property
+    def next_stage(self):
+        return Stage.query.filter(Stage.drip_id==self.id, Stage.is_sent==False).order_by('created_at').first()
 
     def transform(self):
         return {
@@ -60,8 +87,31 @@ class Stage(db.Model):
     subject = db.Column(db.Text, nullable=False)
     template = db.Column(db.Text, nullable=False)
     date = db.Column(db.DateTime, nullable=False)
+    variables = db.Column(db.JSON, default={})
+    is_sent = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=func.now())
     updated_at = db.Column(db.DateTime, nullable=False, default=func.now(), onupdate=func.now())
+
+    def get_var(self, email, var):
+        l_vars = self.get_vars(email) 
+        if l_vars:
+            return l_vars.get(var)
+        return None
+
+    def get_vars(self, email):
+        if self.variables and email in self.variables:
+            return self.variables[email]
+        return None
+
+    def list_vars(self):
+        import re
+        matches = re.findall(r"({{ *?\w+ *?}})", self.template)
+        res = {}
+        if matches:
+            for match in matches:
+                var_name = match.strip('{{').strip('}}').strip()
+                res[var_name] = self.get_vars(var_name)
+        return res
 
     def transform(self):
         return {

@@ -1,30 +1,129 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block title %} drip.title {% endblock %} {% block second_title %}
+<a class="navbar-brand" href="/drips/{{ drip.id }}">
+    <h5> Stages </h5>
+</a>
+{% endblock %} {% block content %}
 <div class="container-fluid" id="app">
     <div class="card bg-light mb-3">
-        <div class="card-header"><h4><strong>{{ drip.title }}</strong></h4></div>
-        <div class="card-block" style="padding: 10px 20px 10px 20px;background: white;">
-            <p class="card-text">
-                {{ drip.description }}
-            </p>
+        <div class="card-header">
+            <h4 class="float-left"><strong>{{ drip.title }}</strong></h4>
+            <h5 class="float-right">
+                {% if not drip.is_enabled %}
+                    <a href="/drips/{{drip.id}}/enable">Enable</a>
+                {% else %}
+                    <a href="/drips/{{drip.id}}/disable">Disable</a>
+                {% endif %}
+            </h5>
         </div>
+    <div class="card-block" style="padding: 10px 20px 10px 20px;background: white;">
+        <p class="card-text">
+            {{ drip.description }}
+        </p>
     </div>
-    <form action="/drips/{{drip.id}}/emails" method="POST">
-        <div class="form-group">
-            <label for="exampleFormControlInput1">Attach Email</label>
+</div>
+<h3>Emails</h3>
+<form action="/drips/{{drip.id}}/emails" method="POST">
+    <label for="exampleFormControlInput1">Attach Email</label>
+    <div class="form-row">
+        <div class="form-group col-md-6">
             <input type="email" class="form-control" name="email" placeholder="email@example.com">
         </div>
-        <div class="form-group">
-            <button class="btn btn-md btn-success float-right" type="submit">Attach</button>
+        <div class="form-group col-md-4">
+            <label></label>
+            <button class="btn btn-md btn-success float-left" type="submit">Attach</button>
         </div>
-        <ul>
-            {% if drip.recipient %}
-                {% for email in drip.recipient.split(',') %}
-                    <li>{{email}}</li>
-                {% endfor %}
-            {% endif %}
-        </ul>
+    </div>
+    <div class="card-columns" style="margin: 10px;">
+        {% if drip.recipient %} {% for email in drip.recipient.split(',') %}
+        <div class="row">
+            <div class="col">
+                <div class="card" style="">
+                    <div class="card-header">
+                        <span>{{email}}</span>
+                        <span>
+                                <a href="/drips/{{drip.id}}/emails/{{email}}">
+                                <button type="button" class="close" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                        </button>
+                        </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %} {% endif %}
+    </div>
+</form>
+<hr>
+<h3>Stages</h3> {% with messages = get_flashed_messages() %} {% if messages %}
+<ul class=flashes>
+    {% for message in messages %}
+    <small class="form-text text-danger" v-if="error">{{ message }}</small> {% endfor %}
+</ul>
+{% endif %} {% endwith %} {% block body %}{% endblock %} {% if not drip.is_completed %}
+<div>
+    <form action="/drips/{{drip.id}}/stages" method="POST">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" name="name" placeholder="stage name" required="true">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="date">Date</label>
+                <input type="date" class="form-control" name="date" placeholder="Date" required="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" class="form-control" name="subject" placeholder="email subject" required="true">
+        </div>
+        <div class="form-group">
+            <label for="templates">Email Template</label>
+            <textarea class="form-control" name="templates"></textarea>
+            <!-- Include stylesheet -->
+            <!-- <link href="https://cdn.quilljs.com/1.3.4/quill.snow.css" rel="stylesheet"> -->
+            <!-- Create the editor container -->
+               <!--  <div id="editor" required="true">
+                </div> -->
+            <!-- Include the Quill library -->
+            <!-- <script src="https://cdn.quilljs.com/1.3.4/quill.js"></script> -->
+
+            <!-- Initialize Quill editor -->
+            <!-- <script>
+              var quill = new Quill('#editor', {
+                theme: 'snow'
+              });
+              console.log(quill);
+            </script> -->
+            <!-- </textarea> -->
+        </div>
+        <div class="form-group">
+            <button class="btn btn-md btn-success float-right" type="submit">Add</button>
+        </div>
     </form>
 </div>
-
+{%endif%}
+<br>
+<br>
+<br>
+<div class="card-columns" style="margin: 10px;">
+    {% if drip.stages %} {% for stage in drip.stages %}
+    <div class="row">
+        <div class="col">
+            <div class="card" style="">
+                <div class="card-block">
+                    <div class="card-header">
+                        <a href="/drips/{{ drip.id }}/stages/{{ stage.id }}" class="card-link">{{stage.name}}</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-subtitle mb-2 text-muted">Date : {{stage.date}}</div>
+                        <div class="card-subtitle mb-2 text-muted">variables : {{','.join(stage.list_vars().keys())}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %} {% endif %}
+</div>
+</div>
 {% endblock %}

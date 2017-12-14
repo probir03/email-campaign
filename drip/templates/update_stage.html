@@ -1,0 +1,72 @@
+{% extends "base.html" %} 
+{% block title %} stage.name {% endblock %}
+{% block second_title %}
+<a class="navbar-brand" href="/drips/{{ stage.drip.id }}">
+    <h5> Stages </h5>
+</a>
+{% endblock %}
+{% block content %}
+<br>
+<div class="container">
+    <form action="/drips/{{ stage.drip.id }}/stages/{{ stage.id }}" method="POST">
+        <div class="form-group">
+            <label for="name">Stage Name</label>
+            <input type="input" class="form-control" name="name" value="{{stage.name}}" placeholder="Name">
+        </div>
+        <div class="form-group">
+            <label for="subject">Email Subject</label>
+            <input type="input" class="form-control" name="subject" value="{{stage.subject}}" placeholder="Subject">
+        </div>
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="input" class="form-control" name="date" value="{{stage.date}}" placeholder="title">
+        </div>
+        <div class="form-group">
+            <label for="template">Email Template</label>
+            <textarea class="form-control" rows="10" name="template" placeholder="Template">{{ stage.template }}</textarea>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-md btn-success float-right" type="submit">Update</button>
+        </div>
+    </form>
+
+    <br>
+    <hr>
+    <h3>Update variables</h3>
+    <form action="/drips/{{ stage.drip.id }}/stages/{{ stage.id }}/vars/csv" method="POST" enctype="multipart/form-data">
+        <input type="file" name="var_csv">
+        <input type="submit" name="submit_csv">
+    </form>
+    <br>
+    {% for email in stage.drip.recipient_list %}
+    <h5>{{ email }}</h5>
+    <a target="_blank" href="/drips/{{ stage.drip.id }}/stages/{{ stage.id }}/view?email={{email}}">View template</a>
+    <form action="/drips/{{ stage.drip.id }}/stages/{{ stage.id }}/vars" method="POST">
+
+        <input type="hidden" name="_user_email" value="{{ email }}">
+        
+        <div class="form-row">
+        {% for var, value in stage.list_vars().iteritems() %}
+        <div class="form-group col-md-6">
+            <label for="{{ var }}">{{ var }}</label>
+            <input type="input" class="form-control" name="{{ var }}" 
+            value="{{ stage.get_var(email, var) or '' }}" placeholder="{{var}}">
+        </div>
+        {% endfor %}
+        </div>
+        <div class="form-group">
+            <button class="btn btn-md btn-success float-right" type="submit">Update</button>
+        </div>
+    </form>
+    {% endfor %}
+
+ 	{% if error %}
+        <br/>
+        <div class="row alert alert-danger">
+            <div class="col text-center">
+                {{ error }}
+            </div>
+        </div>
+    {% endif %}   
+</div>
+{% endblock %}

@@ -4,7 +4,9 @@ from Auth.AuthRepository import AuthRepository
 import helpers, datetime, views
 from Auth.AuthValidator import create_user_rule
 from wrapper import GoogleAuthentication
+from app import db
 
+#create an user
 def create_user(data):
 	create_user_rule(data)
 	repo = AuthRepository()
@@ -33,9 +35,10 @@ def social_app_login(request):
 	return getattr(views, helpers.get_authrize_resolver(request.args.get('provider')))(request)
 
 def google_authorize(request):
-	return google_login(GoogleAuthentication.authorize(request))
+	res, creds = GoogleAuthentication.authorize(request)
+	return google_login(res, creds)
 
-def google_login(token):
+def google_login(token, creds):
 	user_info = GoogleAuthentication.get_user_details(token)
 	user = AuthRepository().filter_attribute(User, {'email' : user_info['email']})
 	if user is None:
@@ -50,10 +53,12 @@ def google_login(token):
 			'logo' : user_info['logo']
 		}
 		user = create_user(data)
+	user.credentials = creds.to_json()
+	db.session.commit()
 	session['user'] = user.transform()
 	return True
 
+#Logout an user
 def logout():
-	# tokenRepo = UserTokenRepository()
 	del session['user']
 	return redirect('/')

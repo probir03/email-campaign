@@ -3,45 +3,27 @@ from google.auth.transport import requests as google_requests
 from flask import redirect
 import requests, json, helpers
 from app import app
+from oauth2client.client import flow_from_clientsecrets, OAuth2WebServerFlow
+from oauth2client.client import FlowExchangeError
+from apiclient.discovery import build
+import logging, flask
+import google_auth_oauthlib
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import requests
 
 
+CLIENTSECRETS_LOCATION = 'client_secret_worker.json'
+REDIRECT_URI = helpers.get_local_server_url()+"/app/auth?provider=google"
 
 # (Receive token by HTTPS POST)
 # ...
-
-def authenticate_token(token, device):
-    try:
-        if device == 'web':
-            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), app.config['WEB_GOOGLE_CLIENT_ID'])
-        elif device == 'android' :
-            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), app.config['ANDROID_GOOGLE_CLIENT_ID'])
-        else :
-            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), app.config['IOS_GOOGLE_CLIENT_ID'])
-            
-        # Or, if multiple clients access the backend server:
-        # idinfo = id_token.verify_oauth2_token(token, requests.Request())
-        # if idinfo['aud'] not in [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]:
-        #     raise ValueError('Could not verify audience.')
-
-        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
-            raise ValueError('Wrong issuer.')
-
-        # If auth request is from a G Suite domain:
-        # if idinfo['hd'] != GSUITE_DOMAIN_NAME:
-        #     raise ValueError('Wrong hosted domain.')
-
-        # ID token is valid. Get the user's Google Account ID from the decoded token.
-        userid = idinfo['sub']
-        return create_user_data(json.loads(requests.get('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token='+token).content))
-    except ValueError:
-        raise Exception("invalid google auth token")
-
 def googleDefaults():
     default = {}
     default['token_request_uri'] = "https://accounts.google.com/o/oauth2/auth"
     default['response_type'] = "code"
     default['user_redirect_uri'] = helpers.get_local_server_url()+"/app/auth?provider=google"
-    default['scope'] = "email"
+    default['scope'] = "https://mail.google.com/+https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile"
     default['login_failed_url'] = '/'
     default['access_token_uri'] = 'https://accounts.google.com/o/oauth2/token'
     default['grant_type'] = 'authorization_code'
@@ -49,28 +31,44 @@ def googleDefaults():
 
 
 def redirectTo():
-    url = "{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}".format(
+    url = "{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&access_type=offline&prompt=consent".format(
         token_request_uri = googleDefaults()['token_request_uri'],
         response_type = googleDefaults()['response_type'],
         client_id = app.config['GOOGLE_CLIENT_ID'],
         redirect_uri = googleDefaults()['user_redirect_uri'],
-        scope = googleDefaults()['scope']
+        scope = googleDefaults()['scope'],
+        access_type = 'offline',
         )
     return redirect(url)
 
+def exchange_code(authorization_code):
+    """Exchange an authorization code for OAuth 2.0 credentials.
+
+    Args:
+    authorization_code: Authorization code to exchange for OAuth 2.0
+                        credentials.
+    Returns:
+    oauth2client.client.OAuth2Credentials instance.
+    Raises:
+    CodeExchangeException: an error occurred.
+    """
+    flow = flow_from_clientsecrets(CLIENTSECRETS_LOCATION, ' '.join(googleDefaults()['scope'].split(' ')))
+    flow.redirect_uri = googleDefaults()['user_redirect_uri']
+    try:
+        credentials = flow.step2_exchange(authorization_code)
+        # credentials = flow.crsedentials
+        return credentials
+    except FlowExchangeError, error:
+        logging.error('An error occurred: %s', error)
+        raise Exception(error)
+
 # To Authorize the user with google signin
 def authorize(request):
-    params = {
-        'code':request.args.get('code'),
-        'redirect_uri': googleDefaults()['user_redirect_uri'],
-        'client_id': app.config['GOOGLE_CLIENT_ID'],
-        'client_secret': app.config['GOOGLE_CLIENT_SECRET'],
-        'grant_type': googleDefaults()['grant_type']
-    }
-    resp = requests.post(googleDefaults()['access_token_uri'], data=params)
-    token_data = resp.json()
-    return token_data['access_token']
+    import json
+    creds = exchange_code(request.args.get('code'))
+    return json.loads(creds.to_json())['token_response']['access_token'], creds
 
+#getting user Details
 def get_user_details(token):
     headers = {
         'Authorization': 'Bearer '+token
@@ -81,6 +79,7 @@ def get_user_details(token):
         raise Exception("invalid google auth token")
     return create_user_data(user_info)
 
+#user data to store in database
 def create_user_data(user_info):
     print user_info
     if 'verified_email' in user_info and bool(user_info['verified_email']) is not True:
