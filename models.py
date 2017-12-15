@@ -67,7 +67,7 @@ class Drip(db.Model):
 
     @property
     def running_stage(self):
-        return Stage.query.filter(Stage.drip_id==self.id).order_by('created_at').first()
+        return Stage.query.filter(Stage.drip_id==self.id, Stage.is_sent==False, Stage.date <= datetime.now()).order_by('created_at').first()
 
     @property
     def next_stage(self):

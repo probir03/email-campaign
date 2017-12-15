@@ -28,11 +28,13 @@ class DripCampaign():
 		for email in drip.recipient_list:
 			drip.user
 			drip.owner
+			print "sending"
 			DripCampaign.send_email_task.delay(pickle.dumps(drip), pickle.dumps(stage), email)
 
 	@staticmethod
 	@celery.task
 	def send_email_task(drip, stage, email):
+		print "came"
 		drip = pickle.loads(drip)
 		stage = pickle.loads(stage)
 		owner = drip.owner
@@ -43,9 +45,15 @@ class DripCampaign():
 		response = emailing.send_message(drip.user.email, email, stage.subject, body)
 		if response != 'Error':
 			message.append(response['threadId'])
+		print message, "fghjkjhg"
 		owner.message_thread = message
+		print "sffsfsfsds"
+		print owner
 		stage.is_sent = True
+		db.session.add(stage)
+		db.session.add(owner)
 		db.session.commit()
 		if not drip.next_stage:
 			drip.is_completed = True
+			db.session.add(drip)
 			db.session.commit()
