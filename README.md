@@ -1,4 +1,4 @@
-# email-campaign-
+# email-campaign
 Create env.py file and add keys
 
 	APP_ENV = 'local'
